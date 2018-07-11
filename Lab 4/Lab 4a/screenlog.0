@@ -1,0 +1,42 @@
+
+Poky (Yocto Project Reference Distro) 1.7.2 sparsharora ttyMFD2
+
+sparsharora login: root
+Password: 
+Login incorrect
+
+sparsharora login: root
+Password: 
+root@sparsharora:~# ifconfig
+lo        Link encap:Local Loopback  
+          inet addr:127.0.0.1  Mask:255.0.0.0
+          inet6 addr: ::1/128 Scope:Host
+          UP LOOPBACK RUNNING  MTU:65536  Metric:1
+          RX packets:233 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:233 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0 
+          RX bytes:40694 (39.7 KiB)  TX bytes:40694 (39.7 KiB)
+
+usb0      Link encap:Ethernet  HWaddr 02:00:86:71:c9:d3  
+          inet addr:192.168.2.15  Bcast:192.168.2.255  Mask:255.255.255.0
+          inet6 addr: fe80::86ff:fe71:c9d3/64 Scope:Link
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000 
+          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+
+wlan0     Link encap:Ethernet  HWaddr 90:b6:86:11:25:13  
+          inet addr:172.20.10.3  Bcast:172.20.10.15  Mask:255.255.255.240
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:32056 errors:0 dropped:1 overruns:0 frame:0
+          TX packets:6770 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000 
+          RX bytes:10911499 (10.4 MiB)  TX bytes:607171 (592.9 KiB)
+
+root@sparsharora:~# logout
+
+Poky (Yocto Project Reference Distro) 1.7.2 sparsharora ttyMFD2
+
+sparsharora login: [A[B
+Password: 

@@ -1,0 +1,97 @@
+NAME: Sparsh Arora
+EMAIL: sparsharora@g.ucla.edu
+ID: 804653078
+
+
+SLIP DAYS:3
+
+ 
+FILES:
+
+lab2_add.c - code that display the different implementations of locks
+for a race condition that adds and subtracts to an integer variable
+
+lab2_list.c - code that displays different implementations of locks
+for doubly-linked lists that require the race conditions to insert,
+delete and lookup nodes in the list.
+
+SortedList.c - implementation of SortedList.h functions that perform
+the insert, delete and lookup operations of the doubly linked
+list. These are implemented with the yield options.
+
+lab2_add.csv - contains all the outputs of the ./lab2_add file results
+with various options.
+
+lab2_list.csv - contains all the outputsof the ./lab2_list file results
+with various options.
+
+lab2-add-1/2/3/4/5.png - graphs that were created using the test.sh
+file that show results of the outputs and help us compare them.
+
+lab2-list-1/2/3/4/5.png - graphs	      that were created using	the test.sh
+file that show results of the outputs and help us compare them.
+
+Q 2.1.1
+
+When we have a small number of iterations, there is lesser chances of
+two threads overlapping or entering the race condition together since
+the time of execution of small iterations is small. If we consider
+larger iterations, they would take more time to execute and thus the
+chances of threads to enter the race condition are more and thus they
+cause errors. In this case we add and subtract 1 and these operations
+are in the critical section so even though the counter should remain
+on 0, it assumes different values.
+
+Q 2.1.2
+
+The yield option makes use of the sched_yield() which switches between
+threads, the cost of switching between threads is the extra time the
+code takes to complete. This is why they take more time and thus the
+--yield runs are comparatively slower. 
+Since, the additional time to switch between threads is quite high,
+the actual cost of operations is altered due to the switching in
+threads and thus it is hard to get an accurate per operation time.
+
+Q 2.1.3
+
+As iterations increase, the computation time for these iterations to
+complete also increases. However,with small iterations, the cost of
+thread creation and joining outweighs the cost of iterations and thus
+gives a higher total time. When iterations increase, we know that
+average time per operation = (time/iteration*threads) so the average
+time decreases as iterations increase and this balances out the cost
+of creating threads. 
+Since cost per iteration is a function of iteration, as iterations
+increase (to infinity) the cost would all tend to go towards a single
+value. This would constitute the correct cost.
+
+Q 2.1.4
+
+For small number of threads, there is rarely any clashes in the
+critical section and thus the threads do not need to wait or fight to
+get chosen to run the code. However, as the number of threads
+increase, there are more contests in the critical section forcing the
+code to make threads wait which increases the cost of operations and
+thus slows the process down.
+
+
+Q 2.2.1
+
+For the doubly-linked-list, the cost of operations is higher with
+mutex as compared to the add part of the code. This is because the
+part-2 (list.c) performs operations that are expensive like inserting
+and deleting and looking up while the add.c only adds and subtracts
+one which requires much lesser time. The curve for add.c shows that
+the time initially increases and the goes on to decrease With list.c
+however, it increases constantly. The add.c has the cost decreasing
+towards the end as the threads increase which means that parallelism
+decreases cost.
+
+Q 2.2.2
+
+For add.c, the cost of spin locks is much more than the cost of mutex
+locks especially as the threads increasing because spin locks while
+they wait keep spinning thus taking up more time as compared to mutex
+locks. For list.c, the cost of spin locks is again more than the cost
+of mutex locks as thread increases due to threads not being able to
+get out of spinning while they wait to get scheduled.

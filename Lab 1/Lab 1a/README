@@ -1,0 +1,24 @@
+NAME: Sparsh Arora
+EMAIL: sparsharora@g.ucla.edu
+ID: 804653078
+
+Files:
+
+lab1a.c: executable that reads from keyboard a non-canonical
+input. Without the shell option, it writes to stdout and maps every lf
+and cr to <cr><lf>. With the shell option, I used 2 pipes, handling
+communication between input and the shell and the shell and stdout. We
+use the pollid to stall the parent and wait for input and errors. I
+used the fork() to create a child process that executes the shell
+while the parent process reads input and writes the shell output. The
+program exits succesfully whenever ^D is encountered and returns 0.
+
+Makefile: contains dist that tars the required files, clean that
+removes all excess files and make that compiles the executable
+
+RESEARCH: 
+
+most of the research for the APIs and example codes was done
+from either man pages available on terminal or the GNU library pages
+
+****SLIP DAYS USED = 1

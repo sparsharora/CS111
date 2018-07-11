@@ -1,0 +1,513 @@
+Total: 3112 samples
+    2382  76.5%  76.5%     3112 100.0% list_op
+     416  13.4%  89.9%      416  13.4% SortedList_length
+     252   8.1%  98.0%      252   8.1% __strcmp_sse42
+      31   1.0%  99.0%      156   5.0% SortedList_insert
+      27   0.9%  99.9%      158   5.1% SortedList_lookup
+       4   0.1% 100.0%        4   0.1% _init
+       0   0.0% 100.0%     3112 100.0% __clone
+       0   0.0% 100.0%     3112 100.0% start_thread
+ROUTINE ====================== list_op in /u/cs/ugrad/arora/lab2a/lab2_list.c
+  2382   3112 Total samples (flat / cumulative)
+     .      .   45: 
+     .      .   46:   return hash;
+     .      .   47: }
+     .      .   48: 
+     .      .   49: void* list_op(void* id)
+---
+     .      .   50: {
+     .      .   51:   struct timespec start_time;
+     .      .   52:   struct timespec end_time;
+     .      .   53:   long long ns=0;
+     .      .   54:   int k, rc;
+     .      .   55:   //fprintf(stderr,"here10\n");
+     .      .   56:   int pid=*(int*)id;
+     .      .   57:   unsigned long list_num;
+     .      .   58:   //fprintf(stderr,"%d\n",pid);
+     .      .   59:   for(k=pid;k<(th*it);k+=th)
+     .      .   60:     {
+     .      .   61:       list_num=(hash((nodes+k)->key))%test_lists;
+     .      .   62:       if(sync_f==1)
+     .      .   63: 	{
+     .      .   64: 	  if(mflag==1)
+     .      .   65: 	    {
+     .      .   66: 	      clock_gettime(CLOCK_MONOTONIC, &start_time);
+     .      .   67: 	      pthread_mutex_lock(lock+list_num);
+     .      .   68: 	      clock_gettime(CLOCK_MONOTONIC, &end_time);
+     .      .   69: 	      
+     .      .   70: 	      ns = end_time.tv_sec - start_time.tv_sec;
+     .      .   71: 	      ns *= 1000000000;
+     .      .   72: 	      ns += end_time.tv_nsec;
+     .      .   73: 	      ns -= start_time.tv_nsec;
+     .      .   74: 	      mutex_ns+=ns;
+     .      .   75: 	      
+     .      .   76: 	      SortedList_insert(list+list_num,&nodes[k]);
+     .      .   77: 	      pthread_mutex_unlock(lock+list_num);
+     .      .   78: 	    }
+     .      .   79: 	  if(sflag==1)
+     .      .   80: 	    {
+     .      .   81: 	      clock_gettime(CLOCK_MONOTONIC, &start_time);
+   577    577   82: 	      while (__sync_lock_test_and_set(s_lock+list_num, 1));
+     .      .   83: 	      clock_gettime(CLOCK_MONOTONIC, &end_time);
+     .      .   84: 
+     .      .   85:               ns = end_time.tv_sec - start_time.tv_sec;
+     .      .   86:               ns *= 1000000000;
+     .      .   87:               ns += end_time.tv_nsec;
+     .      .   88:               ns -= start_time.tv_nsec;
+     .      .   89:               mutex_ns+=ns;
+     .      .   90: 
+     .    156   91: 	      SortedList_insert(list+list_num,&nodes[k]);
+     .      .   92: 	      __sync_lock_release(s_lock+list_num);
+     .      .   93: 	    }
+     .      .   94: 	}
+     .      .   95:       else
+     .      .   96: 	{
+     .      .   97: 	  SortedList_insert(list+list_num,&nodes[k]);
+     .      .   98: 	  //fprintf(stderr,"HERE\n");
+     .      .   99: 	}
+     .      .  100:     }
+     .      .  101:   
+     .      .  102:   for(k=pid;k<(th*it);k+=th)
+     .      .  103:     {
+     .      .  104:       list_num=(hash((nodes+k)->key))%test_lists;
+     .      .  105:       if(sync_f==1)
+     .      .  106:         {
+     .      .  107:           if(mflag==1)
+     .      .  108:             {
+     .      .  109: 	      clock_gettime(CLOCK_MONOTONIC, &start_time);
+     .      .  110:               pthread_mutex_lock(lock+list_num);
+     .      .  111:               clock_gettime(CLOCK_MONOTONIC, &end_time);
+     .      .  112: 
+     .      .  113:               ns = end_time.tv_sec - start_time.tv_sec;
+     .      .  114:               ns *= 1000000000;
+     .      .  115:               ns += end_time.tv_nsec;
+     .      .  116:               ns -= start_time.tv_nsec;
+     .      .  117:               mutex_ns+=ns;
+     .      .  118: 
+     .      .  119: 	      size=SortedList_length(list+list_num);
+     .      .  120: 	      if(size==-1)
+     .      .  121: 		{
+     .      .  122: 		  fprintf(stderr,"CORRUPTED list length!!\n");
+     .      .  123: 		  exit(2);
+     .      .  124: 		}
+     .      .  125:               pthread_mutex_unlock(lock+list_num);
+     .      .  126:             }
+     .      .  127:           if(sflag==1)
+     .      .  128:             {
+     .      .  129: 	      clock_gettime(CLOCK_MONOTONIC, &start_time);
+  1206   1206  130:               while (__sync_lock_test_and_set(s_lock+list_num, 1));
+     1      1  131: 	      clock_gettime(CLOCK_MONOTONIC, &end_time);
+     .      .  132: 
+     .      .  133:               ns = end_time.tv_sec - start_time.tv_sec;
+     .      .  134:               ns *= 1000000000;
+     .      .  135:               ns += end_time.tv_nsec;
+     .      .  136:               ns -= start_time.tv_nsec;
+     .      .  137:               mutex_ns+=ns;
+     .      .  138: 	      
+     .    350  139: 	      size=SortedList_length(list+list_num);
+     .      .  140: 	      if(size==-1)
+     .      .  141: 		{
+     .      .  142:                   fprintf(stderr,"CORRUPTED list length!!\n");
+     .      .  143: 		  exit(2);
+     .      .  144:                 } 
+     .      .  145: 	      __sync_lock_release(s_lock+list_num);
+     .      .  146:             }
+     .      .  147:         }
+     .      .  148:       else
+     .      .  149:         {
+     .      .  150: 	  size= SortedList_length(list+list_num);
+     .      .  151: 	  if(size==-1)
+     .      .  152: 	    {
+     .      .  153: 	      fprintf(stderr,"CORRUPTED list length!!\n");
+     .      .  154: 	      exit(2);
+     .      .  155: 	    }
+     .      .  156:                                                                                                                                                                        
+     .      .  157:         }
+     .      .  158:     }
+     .      .  159: 
+     .      .  160:   //  fprintf(stderr,"middle\n");
+     .      .  161:   for(k=pid;k<(th*it);k+=th)
+     .      .  162:     {
+     .      .  163:       SortedListElement_t *store;
+     .      .  164:       list_num=(hash((nodes+k)->key))%test_lists;
+     .      .  165:       if(sync_f==1)
+     .      .  166: 	{
+     .      .  167: 	  if(mflag==1)
+     .      .  168: 	    {
+     .      .  169: 	      clock_gettime(CLOCK_MONOTONIC, &start_time);
+     .      .  170: 	      pthread_mutex_lock(lock+list_num);
+     .      .  171: 	      clock_gettime(CLOCK_MONOTONIC, &end_time);
+     .      .  172: 
+     .      .  173:               ns = end_time.tv_sec - start_time.tv_sec;
+     .      .  174:               ns *= 1000000000;
+     .      .  175:               ns += end_time.tv_nsec;
+     .      .  176:               ns -= start_time.tv_nsec;
+     .      .  177:               mutex_ns+=ns;
+     .      .  178: 
+     .      .  179: 	      store=SortedList_lookup(list+list_num,(nodes+k)->key);
+     .      .  180: 	      if(store==NULL)
+     .      .  181: 		{
+     .      .  182: 		  fprintf(stderr,"Unable to find element! \n");
+     .      .  183: 		  exit(2);
+     .      .  184: 		}
+     .      .  185: 	      else
+     .      .  186: 		{
+     .      .  187: 		  rc=SortedList_delete(store);
+     .      .  188: 		  if(rc)
+     .      .  189: 		    {
+     .      .  190: 		      fprintf(stderr,"Unable to delete element! \n");
+     .      .  191: 		      exit(2);
+     .      .  192: 		    }
+     .      .  193: 		}
+     .      .  194: 	      pthread_mutex_unlock(lock+list_num);
+     .      .  195: 	    }
+     .      .  196: 	  if(sflag==1)
+     .      .  197: 	    {
+     .      .  198: 	      clock_gettime(CLOCK_MONOTONIC, &start_time);
+   505    505  199: 	      while (__sync_lock_test_and_set(s_lock+list_num, 1));
+     .      .  200: 	      clock_gettime(CLOCK_MONOTONIC, &end_time);
+     .      .  201: 
+     1      1  202:               ns = end_time.tv_sec - start_time.tv_sec;
+     .      .  203:               ns *= 1000000000;
+     .      .  204:               ns += end_time.tv_nsec;
+     .      .  205:               ns -= start_time.tv_nsec;
+     .      .  206:               mutex_ns+=ns;
+     .      .  207: 
+     .    158  208: 	      store=SortedList_lookup(list+list_num,(nodes+k)->key);
+     .      .  209:               if(store==NULL)
+     .      .  210:                 {
+     .      .  211:                   fprintf(stderr,"Unable to find element! \n");
+     .      .  212:                   exit(2);
+     .      .  213:                 }
+     .      .  214:               else
+     .      .  215:                 {
+     .      .  216:                   rc=SortedList_delete(store);
+     .      .  217:                   if(rc)
+     .      .  218:                     {
+     .      .  219:                       fprintf(stderr,"Unable to delete element! \n");
+     .      .  220:                       exit(2);
+     .      .  221:                     }
+     .      .  222:                 }
+     .      .  223: 	      __sync_lock_release(s_lock+list_num);
+     .      .  224: 	    }
+     .      .  225: 	}
+     .      .  226:       else
+     .      .  227: 	{
+     .      .  228: 	  store=SortedList_lookup(list+list_num,(nodes+k)->key);
+     .      .  229: 	  if(store==NULL)
+     .      .  230: 	    {
+     .      .  231: 	      fprintf(stderr,"Unable to find element! \n");
+     .      .  232: 	      exit(2);
+     .      .  233: 	    }
+     .      .  234: 	  else
+     .      .  235: 	    {
+     .      .  236: 	      rc=SortedList_delete(store);
+     .      .  237: 	      if(rc)
+     .      .  238: 		{
+     .      .  239: 		  fprintf(stderr,"Unable to delete element! \n");
+     .      .  240: 		  exit(2);
+     .      .  241: 		}
+     .      .  242: 	    }
+     .      .  243: 	}
+     .      .  244: 	      
+     .      .  245:     }
+     .      .  246:   // fprintf(stderr,"here3\n");
+     .      .  247:   for(k=pid;k<(th*it);k+=th)
+     .      .  248:     {
+     .      .  249:       list_num=(hash((nodes+k)->key))%test_lists;
+     .      .  250:       if(sync_f==1)
+     .      .  251:         {
+     .      .  252:           if(mflag==1)
+     .      .  253:             {
+     .      .  254:               pthread_mutex_lock(lock+list_num);
+     .      .  255:               size=SortedList_length(list+list_num);
+     .      .  256:               if(size==-1)
+     .      .  257:                 {
+     .      .  258:                   fprintf(stderr,"CORRUPTED list length!!\n");
+     .      .  259:                   exit(2);
+     .      .  260:                 }
+     .      .  261:               pthread_mutex_unlock(lock+list_num);
+     .      .  262:             }
+     .      .  263:           if(sflag==1)
+     .      .  264:             {
+    92     92  265:               while (__sync_lock_test_and_set(s_lock+list_num, 1));
+     .     66  266:               size=SortedList_length(list+list_num);
+     .      .  267:               if(size==-1)
+     .      .  268:                 {
+     .      .  269:                   fprintf(stderr,"CORRUPTED list length!!\n");
+     .      .  270:                   exit(2);
+     .      .  271:                 }
+     .      .  272:               __sync_lock_release(s_lock+list_num);
+     .      .  273:             }
+     .      .  274:         }
+     .      .  275:       else
+     .      .  276:         {
+     .      .  277:           size= SortedList_length(list+list_num);
+     .      .  278:           if(size==-1)
+     .      .  279:             {
+     .      .  280:               fprintf(stderr,"CORRUPTED list length!!\n");
+     .      .  281: 	      exit(2);
+     .      .  282:             }
+     .      .  283: 
+     .      .  284:         }
+     .      .  285:     }
+     .      .  286:   // return NULL;
+     .      .  287: }
+---
+     .      .  288:       
+     .      .  289: int
+     .      .  290: main(int argc, char **argv)
+     .      .  291: {
+     .      .  292: 
+ROUTINE ====================== list_op in /u/cs/ugrad/arora/lab2a/lab2_list.c
+  2382   3112 Total samples (flat / cumulative)
+     .      .   45: 
+     .      .   46:   return hash;
+     .      .   47: }
+     .      .   48: 
+     .      .   49: void* list_op(void* id)
+---
+     .      .   50: {
+     .      .   51:   struct timespec start_time;
+     .      .   52:   struct timespec end_time;
+     .      .   53:   long long ns=0;
+     .      .   54:   int k, rc;
+     .      .   55:   //fprintf(stderr,"here10\n");
+     .      .   56:   int pid=*(int*)id;
+     .      .   57:   unsigned long list_num;
+     .      .   58:   //fprintf(stderr,"%d\n",pid);
+     .      .   59:   for(k=pid;k<(th*it);k+=th)
+     .      .   60:     {
+     .      .   61:       list_num=(hash((nodes+k)->key))%test_lists;
+     .      .   62:       if(sync_f==1)
+     .      .   63: 	{
+     .      .   64: 	  if(mflag==1)
+     .      .   65: 	    {
+     .      .   66: 	      clock_gettime(CLOCK_MONOTONIC, &start_time);
+     .      .   67: 	      pthread_mutex_lock(lock+list_num);
+     .      .   68: 	      clock_gettime(CLOCK_MONOTONIC, &end_time);
+     .      .   69: 	      
+     .      .   70: 	      ns = end_time.tv_sec - start_time.tv_sec;
+     .      .   71: 	      ns *= 1000000000;
+     .      .   72: 	      ns += end_time.tv_nsec;
+     .      .   73: 	      ns -= start_time.tv_nsec;
+     .      .   74: 	      mutex_ns+=ns;
+     .      .   75: 	      
+     .      .   76: 	      SortedList_insert(list+list_num,&nodes[k]);
+     .      .   77: 	      pthread_mutex_unlock(lock+list_num);
+     .      .   78: 	    }
+     .      .   79: 	  if(sflag==1)
+     .      .   80: 	    {
+     .      .   81: 	      clock_gettime(CLOCK_MONOTONIC, &start_time);
+   577    577   82: 	      while (__sync_lock_test_and_set(s_lock+list_num, 1));
+     .      .   83: 	      clock_gettime(CLOCK_MONOTONIC, &end_time);
+     .      .   84: 
+     .      .   85:               ns = end_time.tv_sec - start_time.tv_sec;
+     .      .   86:               ns *= 1000000000;
+     .      .   87:               ns += end_time.tv_nsec;
+     .      .   88:               ns -= start_time.tv_nsec;
+     .      .   89:               mutex_ns+=ns;
+     .      .   90: 
+     .    156   91: 	      SortedList_insert(list+list_num,&nodes[k]);
+     .      .   92: 	      __sync_lock_release(s_lock+list_num);
+     .      .   93: 	    }
+     .      .   94: 	}
+     .      .   95:       else
+     .      .   96: 	{
+     .      .   97: 	  SortedList_insert(list+list_num,&nodes[k]);
+     .      .   98: 	  //fprintf(stderr,"HERE\n");
+     .      .   99: 	}
+     .      .  100:     }
+     .      .  101:   
+     .      .  102:   for(k=pid;k<(th*it);k+=th)
+     .      .  103:     {
+     .      .  104:       list_num=(hash((nodes+k)->key))%test_lists;
+     .      .  105:       if(sync_f==1)
+     .      .  106:         {
+     .      .  107:           if(mflag==1)
+     .      .  108:             {
+     .      .  109: 	      clock_gettime(CLOCK_MONOTONIC, &start_time);
+     .      .  110:               pthread_mutex_lock(lock+list_num);
+     .      .  111:               clock_gettime(CLOCK_MONOTONIC, &end_time);
+     .      .  112: 
+     .      .  113:               ns = end_time.tv_sec - start_time.tv_sec;
+     .      .  114:               ns *= 1000000000;
+     .      .  115:               ns += end_time.tv_nsec;
+     .      .  116:               ns -= start_time.tv_nsec;
+     .      .  117:               mutex_ns+=ns;
+     .      .  118: 
+     .      .  119: 	      size=SortedList_length(list+list_num);
+     .      .  120: 	      if(size==-1)
+     .      .  121: 		{
+     .      .  122: 		  fprintf(stderr,"CORRUPTED list length!!\n");
+     .      .  123: 		  exit(2);
+     .      .  124: 		}
+     .      .  125:               pthread_mutex_unlock(lock+list_num);
+     .      .  126:             }
+     .      .  127:           if(sflag==1)
+     .      .  128:             {
+     .      .  129: 	      clock_gettime(CLOCK_MONOTONIC, &start_time);
+  1206   1206  130:               while (__sync_lock_test_and_set(s_lock+list_num, 1));
+     1      1  131: 	      clock_gettime(CLOCK_MONOTONIC, &end_time);
+     .      .  132: 
+     .      .  133:               ns = end_time.tv_sec - start_time.tv_sec;
+     .      .  134:               ns *= 1000000000;
+     .      .  135:               ns += end_time.tv_nsec;
+     .      .  136:               ns -= start_time.tv_nsec;
+     .      .  137:               mutex_ns+=ns;
+     .      .  138: 	      
+     .    350  139: 	      size=SortedList_length(list+list_num);
+     .      .  140: 	      if(size==-1)
+     .      .  141: 		{
+     .      .  142:                   fprintf(stderr,"CORRUPTED list length!!\n");
+     .      .  143: 		  exit(2);
+     .      .  144:                 } 
+     .      .  145: 	      __sync_lock_release(s_lock+list_num);
+     .      .  146:             }
+     .      .  147:         }
+     .      .  148:       else
+     .      .  149:         {
+     .      .  150: 	  size= SortedList_length(list+list_num);
+     .      .  151: 	  if(size==-1)
+     .      .  152: 	    {
+     .      .  153: 	      fprintf(stderr,"CORRUPTED list length!!\n");
+     .      .  154: 	      exit(2);
+     .      .  155: 	    }
+     .      .  156:                                                                                                                                                                        
+     .      .  157:         }
+     .      .  158:     }
+     .      .  159: 
+     .      .  160:   //  fprintf(stderr,"middle\n");
+     .      .  161:   for(k=pid;k<(th*it);k+=th)
+     .      .  162:     {
+     .      .  163:       SortedListElement_t *store;
+     .      .  164:       list_num=(hash((nodes+k)->key))%test_lists;
+     .      .  165:       if(sync_f==1)
+     .      .  166: 	{
+     .      .  167: 	  if(mflag==1)
+     .      .  168: 	    {
+     .      .  169: 	      clock_gettime(CLOCK_MONOTONIC, &start_time);
+     .      .  170: 	      pthread_mutex_lock(lock+list_num);
+     .      .  171: 	      clock_gettime(CLOCK_MONOTONIC, &end_time);
+     .      .  172: 
+     .      .  173:               ns = end_time.tv_sec - start_time.tv_sec;
+     .      .  174:               ns *= 1000000000;
+     .      .  175:               ns += end_time.tv_nsec;
+     .      .  176:               ns -= start_time.tv_nsec;
+     .      .  177:               mutex_ns+=ns;
+     .      .  178: 
+     .      .  179: 	      store=SortedList_lookup(list+list_num,(nodes+k)->key);
+     .      .  180: 	      if(store==NULL)
+     .      .  181: 		{
+     .      .  182: 		  fprintf(stderr,"Unable to find element! \n");
+     .      .  183: 		  exit(2);
+     .      .  184: 		}
+     .      .  185: 	      else
+     .      .  186: 		{
+     .      .  187: 		  rc=SortedList_delete(store);
+     .      .  188: 		  if(rc)
+     .      .  189: 		    {
+     .      .  190: 		      fprintf(stderr,"Unable to delete element! \n");
+     .      .  191: 		      exit(2);
+     .      .  192: 		    }
+     .      .  193: 		}
+     .      .  194: 	      pthread_mutex_unlock(lock+list_num);
+     .      .  195: 	    }
+     .      .  196: 	  if(sflag==1)
+     .      .  197: 	    {
+     .      .  198: 	      clock_gettime(CLOCK_MONOTONIC, &start_time);
+   505    505  199: 	      while (__sync_lock_test_and_set(s_lock+list_num, 1));
+     .      .  200: 	      clock_gettime(CLOCK_MONOTONIC, &end_time);
+     .      .  201: 
+     1      1  202:               ns = end_time.tv_sec - start_time.tv_sec;
+     .      .  203:               ns *= 1000000000;
+     .      .  204:               ns += end_time.tv_nsec;
+     .      .  205:               ns -= start_time.tv_nsec;
+     .      .  206:               mutex_ns+=ns;
+     .      .  207: 
+     .    158  208: 	      store=SortedList_lookup(list+list_num,(nodes+k)->key);
+     .      .  209:               if(store==NULL)
+     .      .  210:                 {
+     .      .  211:                   fprintf(stderr,"Unable to find element! \n");
+     .      .  212:                   exit(2);
+     .      .  213:                 }
+     .      .  214:               else
+     .      .  215:                 {
+     .      .  216:                   rc=SortedList_delete(store);
+     .      .  217:                   if(rc)
+     .      .  218:                     {
+     .      .  219:                       fprintf(stderr,"Unable to delete element! \n");
+     .      .  220:                       exit(2);
+     .      .  221:                     }
+     .      .  222:                 }
+     .      .  223: 	      __sync_lock_release(s_lock+list_num);
+     .      .  224: 	    }
+     .      .  225: 	}
+     .      .  226:       else
+     .      .  227: 	{
+     .      .  228: 	  store=SortedList_lookup(list+list_num,(nodes+k)->key);
+     .      .  229: 	  if(store==NULL)
+     .      .  230: 	    {
+     .      .  231: 	      fprintf(stderr,"Unable to find element! \n");
+     .      .  232: 	      exit(2);
+     .      .  233: 	    }
+     .      .  234: 	  else
+     .      .  235: 	    {
+     .      .  236: 	      rc=SortedList_delete(store);
+     .      .  237: 	      if(rc)
+     .      .  238: 		{
+     .      .  239: 		  fprintf(stderr,"Unable to delete element! \n");
+     .      .  240: 		  exit(2);
+     .      .  241: 		}
+     .      .  242: 	    }
+     .      .  243: 	}
+     .      .  244: 	      
+     .      .  245:     }
+     .      .  246:   // fprintf(stderr,"here3\n");
+     .      .  247:   for(k=pid;k<(th*it);k+=th)
+     .      .  248:     {
+     .      .  249:       list_num=(hash((nodes+k)->key))%test_lists;
+     .      .  250:       if(sync_f==1)
+     .      .  251:         {
+     .      .  252:           if(mflag==1)
+     .      .  253:             {
+     .      .  254:               pthread_mutex_lock(lock+list_num);
+     .      .  255:               size=SortedList_length(list+list_num);
+     .      .  256:               if(size==-1)
+     .      .  257:                 {
+     .      .  258:                   fprintf(stderr,"CORRUPTED list length!!\n");
+     .      .  259:                   exit(2);
+     .      .  260:                 }
+     .      .  261:               pthread_mutex_unlock(lock+list_num);
+     .      .  262:             }
+     .      .  263:           if(sflag==1)
+     .      .  264:             {
+    92     92  265:               while (__sync_lock_test_and_set(s_lock+list_num, 1));
+     .     66  266:               size=SortedList_length(list+list_num);
+     .      .  267:               if(size==-1)
+     .      .  268:                 {
+     .      .  269:                   fprintf(stderr,"CORRUPTED list length!!\n");
+     .      .  270:                   exit(2);
+     .      .  271:                 }
+     .      .  272:               __sync_lock_release(s_lock+list_num);
+     .      .  273:             }
+     .      .  274:         }
+     .      .  275:       else
+     .      .  276:         {
+     .      .  277:           size= SortedList_length(list+list_num);
+     .      .  278:           if(size==-1)
+     .      .  279:             {
+     .      .  280:               fprintf(stderr,"CORRUPTED list length!!\n");
+     .      .  281: 	      exit(2);
+     .      .  282:             }
+     .      .  283: 
+     .      .  284:         }
+     .      .  285:     }
+     .      .  286:   // return NULL;
+     .      .  287: }
+---
+     .      .  288:       
+     .      .  289: int
+     .      .  290: main(int argc, char **argv)
+     .      .  291: {
+     .      .  292: 

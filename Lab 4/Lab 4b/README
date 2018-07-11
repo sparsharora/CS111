@@ -1,0 +1,26 @@
+NAME: Sparsh Arora
+EMAIL: sparsharora@g.ucla.edu
+UID: 804653078
+
+Slip Days = 0
+
+Research:
+synced my edison with local time using the commands and steps described in the
+following link:
+https://communities.intel.com/thread/56294
+
+For functionality of strtok() I researched the link
+https://stackoverflow.com/questions/3889992/how-does-strtok-split-the-string-into-tokens-in-c
+ 
+Files:
+
+lab4b.c: Source code for edison that has attached a temperature sensor and a
+button that helps us log the results from the sensor into log files.
+
+Makefile: has functionality to build (default), smoke test (check), create a
+tar file (dist) and delete the exectuable (clean)
+
+README: has all information on the .tar file about this project
+
+testcases.sh : smoke test that is used to test the functionality and
+compatibility of code and the sensors with the edison.

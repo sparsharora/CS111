@@ -1,0 +1,26 @@
+NAME: Sparsh Arora
+EMAIL: sparsharora@g.ucla.edu
+UID: 804653078
+
+Slip Days = 0
+
+Research:
+synced my edison with local time using the commands and steps described in the
+following link:
+https://communities.intel.com/thread/56294
+
+ 
+Files:
+
+lab4c_tcp.c: Source code for edison that gets temperature values and sends
+them over to the server using TCP connection.
+
+lab4c_tls.c: Source code for edison that gets temperature values and sends
+them over to the server using TLS connection.
+
+Makefile: has functionality to build (default), create a
+tar file (dist) and delete the exectuable (clean)
+
+README: has all information on the .tar file about this project
+
+

@@ -1,0 +1,92 @@
+NAME: Sparsh Arora
+EMAIL: sparsharora@g.ucla.edu
+ID: 804653078
+
+
+SLIP DAYS:0
+
+RESEARCH: Got my hash function from the following website: http://stackoverflow.com/questions/7666509/hash-function-for-string
+ 
+FILES:
+
+lab2_list.c - code that displays different implementations of locks
+for doubly-linked lists that require the race conditions to insert,
+delete and lookup nodes in the list.
+
+SortedList.c - implementation of SortedList.h functions that perform
+the insert, delete and lookup operations of the doubly linked
+list. These are implemented with the yield options.
+
+test2a.sh - tests to generate required output used in Makefile
+
+profile.out - Execution profiling report output generated form make profile command
+
+lab2b_list.csv - contains all the outputsof the ./lab2_list file results
+with various options.
+
+lab2b_1/2/3/4/5.png - graphs that were created using the test.sh
+file that show results of the outputs and help us compare them.
+
+#QUESTIONS#
+
+
+Q 2.3.1: Cycles in the basic list implementation:
+
+For 1 and 2-thread lists, the cost of thread creation and locking is
+cheap because we have a few threads and there is no contention
+either. Hence, majority of the time is spent on the actual insert,
+delete and lookup operations performed on the list/sublists.
+
+For high-thread spin lock tests most of the time is spent by the threads
+in spinning while waiting to be scheduled.
+For high-thread mutex tests most of the time of the program is spent in the mutex functions
+of initialization, and the threads waiting to be scheduled.
+
+Q 2.3.2
+
+The line of code of the spin lock 
+is consuming most time when run with while (__sync_lock_test_and_set(s_lock+list_num, 1))
+large threads. This happens because threads keep spinning while
+waiting to be scheduled for access to the critical section. As number
+of threads increase, the time spent spinning waiting to be scheduled
+increases as there is now resource contention as a lot of threads
+fight for access to the critical section.
+
+Q 2.3.3
+
+The average lock-time rises up as the number of threads increase
+because as we have more and more threads, the contention of resources
+increases.The threads have to spend a lot of time waiting to be
+scheduled for a large number of threads.
+The reason that this
+increase is so dramatic as compared to the completetion time is that
+for the lock-time, the time is the collection of all the times spent
+by each thread in its critical section. Theseindividual times for
+threads might overlap and this increase the net wait time. Hence, this
+increase is seen to be dramatic. With completion time, there is no
+overlap and for each process the time is calculated as the process
+ends and thus the increase is less dramatic.
+With the overlap in
+individual thread times that are added up, the sum is always greater
+than the complettion and this increases more and more dramatically as
+threads increase. 
+
+Q 2.3.4
+
+As seen from the last two graphs, the aggregate throughput increases
+as the number of lists increase. This happens because as we have more
+and more partitions to the list, the threads can divide the work
+amongst themselves and have access to more critical sections as
+compared to larger lists. This optimizes throughput. 
+
+The throughput doesn't keep increasing as lists increasem rather it seems to reach a
+certain value. This value is reached when seemingly all threads have
+their own sub-list to execute and there will be no resource
+contention.
+
+Throughput for N way partitioned lists are to be compared
+against single lists with 1/N threads i.e checking if throughput for 4
+lists 4 threads is the same as throughput for 1 list 1 thread. On both
+graphs the points for 1 list 1 thread, 2 list 2 threads and so on all
+lie in about the same range and thus I believe such an assumption
+would be reasonable.
